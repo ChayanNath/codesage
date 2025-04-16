@@ -13,12 +13,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
-  // In a real app, you'd use authentication state here
   const isLoggedIn = false;
 
   return (
-    <header className="border-b border-border sticky top-0 z-50 w-full bg-background/90 backdrop-blur-sm">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="container border-b border-border sticky top-0 z-50 w-full bg-background/90 backdrop-blur-sm mx-auto">
+      <div className="flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
             <Code2 className="h-6 w-6 text-accent" />
