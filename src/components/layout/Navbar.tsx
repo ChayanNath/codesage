@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSession, signIn, signOut } from 'next-auth/react';
 import { Github, Code2, Settings, BarChart2, User, LogOut } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
@@ -11,9 +12,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Navbar = () => {
-  const isLoggedIn = false;
+  const { data: session } = useSession();
 
   return (
     <header className="container border-b border-border sticky top-0 z-50 w-full bg-background/90 backdrop-blur-sm mx-auto">
@@ -26,7 +28,7 @@ const Navbar = () => {
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
-          {isLoggedIn && (
+          {session && (
             <>
               <Link href="/dashboard" className="navbar-item">Dashboard</Link>
               <Link href="/repositories" className="navbar-item">Repositories</Link>
@@ -38,15 +40,20 @@ const Navbar = () => {
         </nav>
 
         <div className="flex items-center gap-2">
-          {isLoggedIn ? (
+          {session ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative rounded-full">
-                  <User className="h-5 w-5" />
+                  <Avatar>
+                    <AvatarImage src={session.user?.image ?? ''} />
+                    <AvatarFallback>
+                      {session.user?.name?.split(' ').map(n => n[0]).join('') ?? 'U'}
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>{session.user?.name}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard" className="flex items-center gap-2">
@@ -61,7 +68,10 @@ const Navbar = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-destructive">
+                <DropdownMenuItem
+                  onClick={() => signOut()}
+                  className="flex items-center gap-2 cursor-pointer text-destructive"
+                >
                   <LogOut className="h-4 w-4" />
                   <span>Logout</span>
                 </DropdownMenuItem>
@@ -69,15 +79,13 @@ const Navbar = () => {
             </DropdownMenu>
           ) : (
             <>
-              <Link href="/login">
-                <Button variant="outline">Log in</Button>
-              </Link>
-              <Link href="/login">
-                <Button>
-                  <Github className="mr-2 h-4 w-4" />
-                  Connect with GitHub
-                </Button>
-              </Link>
+              <Button variant="outline" onClick={() => signIn()}>
+                Log in
+              </Button>
+              <Button onClick={() => signIn('github')}>
+                <Github className="mr-2 h-4 w-4" />
+                Connect with GitHub
+              </Button>
             </>
           )}
         </div>
